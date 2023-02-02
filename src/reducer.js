@@ -1,3 +1,0 @@
-function reducer(state, action) {
-    
-}

@@ -1,10 +1,7 @@
-import { List, ListItemText } from '@material-ui/core';
+import { List } from '@material-ui/core';
 import React, { Component } from 'react';
 
 class Display extends Component {
-    constructor(props){
-        super(props);
-      }
 
       render() {
         const {
@@ -18,8 +15,15 @@ class Display extends Component {
             <div>
               <List style={{fontSize : 30}}>
                 {
-                    data.map((operation) => (
-                      <div key={id++}>{operation}</div>
+                    data.map((operation, index) => (
+                      index === data.length - 1 ? 
+                      <div style={{color: "red"}}
+                           key={++id}>
+                        {operation}
+                      </div> : 
+                      <div key={++id}>
+                      {operation}
+                    </div>
                     )
                   )
                 }

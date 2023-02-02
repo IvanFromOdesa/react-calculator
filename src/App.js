@@ -1,11 +1,15 @@
 import React, { Component } from "react";
-import Buttons from './components/buttons'
+import { Provider } from "react-redux";
+import Buttons from './containers/buttons'
+import store from "./store/store";
 
 class App extends Component {
   render() {
     return (
       <React.Fragment>
-        <Buttons/>
+        <Provider store = {store}>
+          <Buttons/>
+        </Provider>
       </React.Fragment>
     );
   }

@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux';
 import store from '../buttons';
-import CalcButton from './calcButton'
-import Display from './display';
+import CalcButton from '../components/calcButton'
+import Display from '../components/display';
+import exprsActions from "../actions/actions";
 
 class Buttons extends Component {
     constructor() {
@@ -47,7 +49,7 @@ class Buttons extends Component {
                     this.clearLine();
                     break;
                 case '=':
-                    if(this.checkSymbol(line)) {
+                    if(this.isLastSymbolAnOperation(line)) {
                         // nothing
                         alert("Enter a number after arythmetic operation!");
                     }
@@ -71,10 +73,9 @@ class Buttons extends Component {
                 case '-':
                 case '/':
                 case '*':
-                    // to exclude 2++, 343-/ etc.
-                    if(this.checkSymbol(line)) {
-                        // nothing
-                        alert("Enter a number!");
+                    // substitute operation with another one
+                    if(this.isLastSymbolAnOperation(line)) {
+                        this.substituteLine(value);
                     }
                     // 2+2* gives 4, 4*...
                     else if(
@@ -111,7 +112,7 @@ class Buttons extends Component {
         })
     }
 
-    checkSymbol(line) {
+    isLastSymbolAnOperation(line) {
         let lastSymbol = line.charAt(line.length - 1);
         return lastSymbol == '+' || 
                lastSymbol == '-' || 
@@ -120,11 +121,24 @@ class Buttons extends Component {
     }
 
     evaluateExpression(fn) {
-        let result =  new Function('return ' + fn)();
-        if(result == "Infinity") {
-            return "Error! Division by zero!"
+        let result = 0;
+        try {
+            result =  new Function('return ' + fn)();
+            if(result == "Infinity" || result == "-Infinity") {
+                return "Error! Division by zero!"
+            }
+            return result.toFixed(2);
+        } catch (error) {
+            // If trying to do math with string "Error!.."
+            alert("That was not a number! Should have cleared the line.");
         }
-        return result.toFixed(2);
+        return "";
+    }
+
+    substituteLine(value) {
+        this.setState({
+            line: this.state.line.slice(0, -1) + value
+        });
     }
 
     appendLine(value) {
@@ -141,11 +155,33 @@ class Buttons extends Component {
         });
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        const {
+            expressions
+        } = this.props;
+
+        // Expressions from BE
+        if(expressions.length && prevState === this.state) {
+            const newData = [...this.state.data];
+            expressions.map(expr => {
+                newData.push(expr + "=" + this.evaluateExpression(expr));
+            })
+            this.setState({
+                data: newData
+            });
+        }
+    }
+
     render() {
         const {
             line,
             data
         } = this.state;
+
+        const {
+            dispatch,
+            loading
+        } = this.props;
 
         return (
             <div>
@@ -155,10 +191,30 @@ class Buttons extends Component {
                                 value={button.value}
                                 clickFunc={this.handleClick}
                     />)}
-                <Display currentLine = {line} data={data}/>
+                    <CalcButton clickFunc={() => exprsActions.fetchExpressions()(dispatch)}
+                                value="Get exprs from BE"
+                    />
+                    {loading && (
+                        <div style={{fontSize : 30}}>
+                            Loading from BE...
+                        </div>
+                    )}
+                <Display currentLine = {line} data = {data}/>
             </div>
         );
     }
 }
 
-export default Buttons;
+const mapReduxStateToProps = reduxState => {
+    return {
+        ...reduxState
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        dispatch
+    }
+}
+
+export default connect(mapReduxStateToProps, mapDispatchToProps)(Buttons);

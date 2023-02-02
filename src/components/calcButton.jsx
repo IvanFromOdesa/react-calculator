@@ -11,10 +11,6 @@ const styles = () => ({
 
 class CalcButton extends Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const {
             num,
