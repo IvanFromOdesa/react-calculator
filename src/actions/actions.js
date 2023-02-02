@@ -25,7 +25,7 @@ const fetchExpressions = () => {
     return (dispatch) => {
         dispatch(fetchExpressionsRequest);
         // Allow CORS by sending a response header "Access-Control-Allow-Origin" from BE
-        axios.get("http://localhost:8080/api/cities/examples", {params: {count: 5}})
+        axios.get("http://localhost:8080/math/examples", {params: {count: 5}})
              .then(response => {
                 const exprs = response.data;
                 dispatch(fetchExpressionsSuccess(exprs));
