@@ -180,7 +180,8 @@ class Buttons extends Component {
 
         const {
             dispatch,
-            loading
+            loading,
+            error
         } = this.props;
 
         return (
@@ -199,6 +200,13 @@ class Buttons extends Component {
                             Loading from BE...
                         </div>
                     )}
+                    {
+                        error && (
+                            <div style={{fontSize : 30}}>
+                                Could not fetch expressions! + {error}
+                            </div>
+                        )
+                    }
                 <Display currentLine = {line} data = {data}/>
             </div>
         );
