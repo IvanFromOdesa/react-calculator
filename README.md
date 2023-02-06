@@ -3,6 +3,7 @@
 + Better code quality
 + Better naming
 + Fix some logic bugs
++ Add styling
 
 # Getting Started with Create React App
 
